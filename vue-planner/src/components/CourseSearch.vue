@@ -21,7 +21,6 @@
           @dragstart="handleDragStart($event, course)"
         >
           <p class="bold">{{ course.code }}</p>
-          <p>{{ course.title.et }}</p>
         </div>
       </div>
     </div>
@@ -73,21 +72,29 @@ export default {
     async searchCourses() {
       if (this.query.trim()) {
         try {
-          // OIS2 api
-          const response = await axios.get(`https://ois2.ut.ee/api/courses/${this.query}`);
-          if (response.data && !Array.isArray(response.data)) {
-            this.courses = [response.data];
+          // Fetch courses that start with the entered letters
+          const response = await axios.get(`https://ois2.ut.ee/api/courses`, {
+            params: {
+              code: this.query.toUpperCase(),
+              take: 20 // How many courses to fetch
+            }
+          });
+          console.log("API Response:", response.data);
+          console.log("Course count:", response.data.length);
+
+          if (response.data && Array.isArray(response.data)) {
+            this.courses = response.data.slice(0, response.length);
           } else {
-            this.courses = response.data;
+            this.courses = [];
           }
-          this.hasInput = true; 
+          this.hasInput = true;
         } catch (error) {
           console.error("Error fetching courses:", error);
           this.courses = [];
           this.hasInput = true;
         }
       } else {
-        this.courses = []; 
+        this.courses = [];
         this.hasInput = false;
       }
     },
@@ -139,20 +146,46 @@ export default {
 }
 
 .kursused {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  border: solid 1px #ddd; 
+  border-radius: 12px; 
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+  gap: 20px; 
+  padding: 20px; 
+  background-color: #f9f9f9; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 .kursus {
-  background-color: aquamarine;
+  background-color: #ffffff; 
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: move;
-  width: 33%;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  word-wrap: break-word;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; 
+}
+
+.kursus:hover {
+  background-color: aquamarine;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+  animation: floatAnimation 1.5s ease-in-out infinite; 
+}
+
+@keyframes floatAnimation {
+  0%, 100% {
+    transform: translateY(0); 
+  }
+  50% {
+    transform: translateY(-10px); 
+  }
 }
 
 .semester-table {
