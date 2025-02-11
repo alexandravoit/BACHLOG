@@ -21,6 +21,7 @@
           @dragstart="handleDragStart($event, course)"
         >
           <p class="bold">{{ course.code }}</p>
+          <p class="title">{{ course.title.et }}</p>
         </div>
       </div>
     </div>
@@ -40,9 +41,11 @@
             class="course-box"
             draggable="true"
             @dragstart="handleCourseDragStart($event, index, courseIndex)"
+            @click="showCourseDetails(course)"
           >
             <span class="delete-btn" @click="deleteCourse(index, courseIndex)">×</span>
-            <p>{{ course.title.et }}</p>
+            <p class="bold">{{ course.code }}</p>
+            <p class="title">{{ course.title.et }}</p>
           </div>
 
         </div>
@@ -84,6 +87,7 @@ export default {
 
           if (response.data && Array.isArray(response.data)) {
             this.courses = response.data.slice(0, response.length);
+            console.log("Final Courses to Display:", this.courses);
           } else {
             this.courses = [];
           }
@@ -124,8 +128,19 @@ export default {
       }
     },
     deleteCourse(semesterIndex, courseIndex) {
+      event.stopPropagation() // disables click event aka popup with info
       this.semesters[semesterIndex].courses.splice(courseIndex, 1);
+    },
+    //TODO create prettier alert
+    showCourseDetails(course) {
+      alert(`
+        ${course.title.et} (${course.code})
+        ${course.credits} EAP
+
+      
+        `);
     }
+
   }
 };
 </script>
@@ -146,18 +161,18 @@ export default {
 }
 
 .kursused {
-  border: solid 1px #ddd; 
-  border-radius: 12px; 
+  border: solid 1px #ddd;
+  border-radius: 12px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-  gap: 20px; 
-  padding: 20px; 
-  background-color: #f9f9f9; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .kursus {
-  background-color: #ffffff; 
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 12px;
   cursor: move;
@@ -170,44 +185,83 @@ export default {
   word-wrap: break-word;
   aspect-ratio: 1 / 1;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  position: relative;
 }
 
 .kursus:hover {
   background-color: aquamarine;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
-  animation: floatAnimation 1.5s ease-in-out infinite; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: floatAnimation 1.5s ease-in-out infinite;
+}
+
+.kursus p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  transition: opacity 0.3s ease;
+}
+
+.kursus .title {
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.kursus:hover .bold {
+  opacity: 0;
+}
+
+.kursus:hover .title {
+  opacity: 1;
 }
 
 @keyframes floatAnimation {
   0%, 100% {
-    transform: translateY(0); 
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px); 
+    transform: translateY(-10px);
   }
 }
 
 .semester-table {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-top: 2rem;
+  gap: 15px;
+  margin-top: 1.5rem;
 }
 
 .semester {
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 20px;
-  min-height: 200px;
+  border: solid 1px #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.semester h3 {
+  font-size: 18px;
+  margin: 0 0 10px 0;
+  color: #333;
 }
 
 .drop-zone {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
   border: 2px solid #ffffff;
   border-radius: 8px;
-  min-height: 150px;
-  padding: 20px;
-  margin-top: 20px;
+  min-height: 100px;
+  padding: 10px;
+  margin-top: 10px;
   transition: background-color 0.2s;
 }
 
@@ -216,31 +270,75 @@ export default {
 }
 
 .course-box {
-  background-color: aquamarine;
-  padding: 20px;
-  margin: 10px 0;
-  border-radius: 8px;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
   cursor: move;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  word-wrap: break-word;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   position: relative;
+}
+
+.course-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: aquamarine;
+}
+
+.course-box p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  transition: opacity 0.3s ease;
+}
+
+.course-box .title {
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.course-box:hover .bold {
+  opacity: 0;
+}
+
+.course-box:hover .title {
+  opacity: 1;
 }
 
 .delete-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 3px;
+  right: 3px;
   cursor: pointer;
-  color: white;
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1;
   width: auto;
   height: auto;
+  transition: color 0.2s ease;
 }
 
 .delete-btn:hover {
-  color: rgb(6, 94, 106)
+  color: #ffffff;
 }
 
 input {
@@ -252,6 +350,5 @@ input {
   border-radius: 8px;
   text-align: center;
   font-size: large;
-
 }
 </style>
