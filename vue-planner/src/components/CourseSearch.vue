@@ -6,7 +6,7 @@
       v-model="query"
       type="text"
       placeholder="KURSUSE KOOD"
-      @input="searchCourses"
+      @input="searchCourses()"
     />
     
     <div v-if="courses.length > 0">
@@ -28,7 +28,7 @@
 
     <p v-else-if="hasInput && query && courses.length === 0">ÜHTEGI TULEMUST EI LEITUD</p>
 
-    <div class="semester-table">
+    <div class="semester-table" :key="componentKey">
 
       <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
         <h3>SEMESTER {{ semester.id }}</h3>
@@ -43,9 +43,10 @@
             @dragstart="handleCourseDragStart($event, index, courseIndex)"
             @click="showCourseDetails(course)"
           >
-            <span class="delete-btn" @click="deleteCourse(index, courseIndex)">×</span>
+            <span class="delete-btn" @click="deleteCourse($event, index, courseIndex)">×</span>
             <p class="bold">{{ course.code }}</p>
-            <p class="title">{{ course.title.et }}</p>
+            <p class="title">{{ course.title }}</p>
+            
           </div>
 
         </div>
@@ -65,15 +66,27 @@ export default {
       query: "",
       courses: [],
       hasInput: false,
+      componentKey: 0,
       semesters: Array.from({ length: 6 }, (_, i) => ({
         id: i + 1,
-        courses: []
+        courses: [],
       }))
     };
   },
+
+  async created() {
+    // Fetch courses for all semesters when the component is created
+    for (let i = 0; i < this.semesters.length; i++) {
+      await this.fetchCoursesForSemester(i + 1);
+    }
+  },
+
+
+  
   methods: {
+    // SEARCH COURSES
     async searchCourses() {
-      if (this.query.trim()) {
+      if (this.query.trim() && this.query.length >= 2) {
         try {
           // Fetch courses that start with the entered letters
           const response = await axios.get(`https://ois2.ut.ee/api/courses`, {
@@ -86,7 +99,7 @@ export default {
           console.log("Course count:", response.data.length);
 
           if (response.data && Array.isArray(response.data)) {
-            this.courses = response.data.slice(0, response.length);
+            this.courses = response.data.slice(0, response.data.length);
             console.log("Final Courses to Display:", this.courses);
           } else {
             this.courses = [];
@@ -102,44 +115,164 @@ export default {
         this.hasInput = false;
       }
     },
+
+    // FETCH FROM API
+    async fetchCourses(semester) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/courses?semester=${semester}`);
+        this.courses = await response.json();
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    },
+
+    async fetchCoursesForSemester(semester) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/courses?semester=${semester}`);
+        const courses = await response.json();
+        this.semesters[semester - 1].courses = courses;
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    },
+
+    // UPDATE ON DRAG
+    async updateCourseSemester(courseId, semester) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/courses/${courseId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ semester }),
+        });
+        const data = await response.json();
+        console.log('Course updated:', data);
+      } catch (error) {
+        console.error('Error updating course:', error);
+      }
+    },
+
+    // HANDLE DRAG AND DROP
     handleDragStart(event, course) {
       event.dataTransfer.setData('text/plain', JSON.stringify({
         type: 'new',
         course
       }));
     },
+
     handleCourseDragStart(event, semesterIndex, courseIndex) {
+      const course = this.semesters[semesterIndex].courses[courseIndex];
       event.dataTransfer.setData('text/plain', JSON.stringify({
         type: 'existing',
+        courseId: course.id, // Ensure the courseId is passed
         semesterIndex,
-        courseIndex
+        courseIndex,
       }));
     },
-    handleDrop(event, targetSemesterIndex) {
+
+    handleDrop(event, semesterIndex) {
       const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-      
+
       if (data.type === 'new') {
-        this.semesters[targetSemesterIndex].courses.push(data.course);
+        // Add a new course to the semester
+        this.addCourseToSemester(data.course, semesterIndex + 1); // semesterIndex + 1 because semesters are 1-6
+
       } else if (data.type === 'existing') {
-        // RM from original semester and add to new
-        const course = this.semesters[data.semesterIndex].courses[data.courseIndex];
-        this.semesters[data.semesterIndex].courses.splice(data.courseIndex, 1);
-        this.semesters[targetSemesterIndex].courses.push(course);
+        // Move an existing course to a new semester
+        this.moveCourseToSemester(data.courseId, semesterIndex + 1); // semesterIndex + 1 because semesters are 1-6
       }
     },
-    deleteCourse(semesterIndex, courseIndex) {
-      event.stopPropagation() // disables click event aka popup with info
-      this.semesters[semesterIndex].courses.splice(courseIndex, 1);
+
+    async addCourseToSemester(course, semester) {
+      try {
+        const response = await fetch('http://localhost:3000/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            semester,
+            code: course.code,
+            title: course.title.et,
+            credits: course.credits,
+          }),
+        });
+        const newCourse = await response.json();
+        console.log('New course data:', newCourse);
+
+        // Add the new course, USING OG COURSE DATA
+        this.semesters[semester - 1].courses.push({
+          id: newCourse.id, // Use the ID from the API response
+          code: course.code, // Use the original course data
+          title: course.title.et, // Use the original course data
+          credits: course.credits, // Use the original course data
+        });
+
+        console.log('Semesters updated array:', this.semesters);
+      } catch (error) {
+        console.error('Error adding course:', error);
+      }
     },
-    //TODO create prettier alert
+
+    async moveCourseToSemester(courseId, semester) {
+      try {
+        // Find the course in the current semester
+        const currentSemesterIndex = this.semesters.findIndex((sem) =>
+          sem.courses.some((course) => course.id === courseId)
+        );
+
+        if (currentSemesterIndex === -1) {
+          console.error('Course not found in any semester');
+          return;
+        }
+
+        const courseIndex = this.semesters[currentSemesterIndex].courses.findIndex(
+          (course) => course.id === courseId
+        );
+
+        if (courseIndex === -1) {
+          console.error('Course not found in the current semester');
+          return;
+        }
+
+        // Remove the course from the current semester
+        const [course] = this.semesters[currentSemesterIndex].courses.splice(courseIndex, 1);
+
+        // Update the course's semester in the database
+        await this.updateCourseSemester(courseId, semester);
+
+        // Add the course to the new semester
+        this.semesters[semester - 1].courses.push(course);
+      } catch (error) {
+        console.error('Error moving course:', error);
+      }
+    },
+
+    // DELETE COURSE
+    async deleteCourse(event, semesterIndex, courseIndex) {
+      event.stopPropagation();
+
+      const course = this.semesters[semesterIndex].courses[courseIndex];
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/courses/${course.id}`, {
+          method: 'DELETE',
+        });
+
+        console.log("Response Status:", response.status);
+
+        // UI deletion
+        this.semesters[semesterIndex].courses.splice(courseIndex, 1);
+
+      } catch (error) {
+        console.error('Error deleting course:', error);
+      }
+    },
+
+    // SHOW COURSE DETAILS
     showCourseDetails(course) {
       alert(`
-        ${course.title.et} (${course.code})
+        ${course.title} (${course.code})
         ${course.credits} EAP
-
-      
-        `);
-    }
+      `);
+    },
 
   }
 };
