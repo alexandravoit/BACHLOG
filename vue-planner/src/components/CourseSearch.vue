@@ -31,7 +31,7 @@
     <div class="semester-table" :key="componentKey">
 
       <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
-        <h3>SEMESTER {{ semester.id }}</h3>
+        <h3>SEMESTER {{ semester.id }} | EAP: {{ getEAP(semester.id) }}</h3>
 
         <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)">
 
@@ -59,6 +59,7 @@
 
 <script>
 import axios from "axios";
+import { forEach } from "lodash";
 
 export default {
   data() {
@@ -272,6 +273,16 @@ export default {
         ${course.title} (${course.code})
         ${course.credits} EAP
       `);
+    },
+
+    getEAP(semesterId) {
+      let eap = 0;
+      let courses = this.semesters[semesterId - 1].courses;
+
+      forEach(courses, (course) => {
+        eap += course.credits;
+      });
+      return eap;
     },
 
   }
