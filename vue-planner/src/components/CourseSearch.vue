@@ -131,7 +131,15 @@ export default {
       try {
         const response = await fetch(`http://localhost:3000/api/courses?semester=${semester}`);
         const courses = await response.json();
-        this.semesters[semester - 1].courses = courses;
+
+        // Add the fetched courses to the semester's courses array
+        this.semesters[semester - 1].courses = courses.map((course) => ({
+          id: course.id,
+          code: course.code,
+          title: course.title,
+          credits: course.credits,
+          season: course.season, // Include the season
+        }));
       } catch (error) {
         console.error('Error fetching courses:', error);
       }
@@ -185,18 +193,29 @@ export default {
 
     async addCourseToSemester(course, semester) {
       try {
+
+        const sem = await this.getSemester(course.code);
+        const season = sem ? sem.conclusion : null;
+        console.log('Fetched season:', season); 
+
+        const payload = {
+          semester,
+          code: course.code,
+          title: course.title.et,
+          credits: course.credits,
+          season, // Include the season
+        };
+
+        console.log('Request payload:', payload); // Log the request payload
+
         const response = await fetch('http://localhost:3000/api/courses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            semester,
-            code: course.code,
-            title: course.title.et,
-            credits: course.credits,
-          }),
+          body: JSON.stringify(payload),
         });
+
         const newCourse = await response.json();
-        console.log('New course data:', newCourse);
+        console.log('New course data from backend:', newCourse);
 
         // Add the new course, USING OG COURSE DATA
         this.semesters[semester - 1].courses.push({
@@ -204,6 +223,7 @@ export default {
           code: course.code, // Use the original course data
           title: course.title.et, // Use the original course data
           credits: course.credits, // Use the original course data
+          season: season, // Include the season
         });
 
         console.log('Semesters updated array:', this.semesters);
@@ -272,6 +292,7 @@ export default {
       alert(`
         ${course.title} (${course.code})
         ${course.credits} EAP
+        SEASON: ${course.season}
       `);
     },
 
@@ -284,6 +305,23 @@ export default {
       });
       return eap;
     },
+
+    // very confusing name, should be season, TODO rename everything that means autumn/spring to season
+    async getSemester(courseCode) {
+      try {
+        const response = await fetch(`http://localhost:5001/course/${courseCode}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const semester = await response.json();
+        console.log('Fetched semester info:', semester); // Log the fetched data
+        return semester;
+      } catch (error) {
+        console.error('Error getting semester:', error);
+        return null;
+      }
+    },
+
 
   }
 };

@@ -18,6 +18,7 @@ db.serialize(() => {
       code TEXT NOT NULL,
       title TEXT NOT NULL,
       credits INTEGER,
+      season TEXT,
       comments TEXT,
       grade TEXT
     )

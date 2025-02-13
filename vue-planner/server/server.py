@@ -1,9 +1,12 @@
 # PYTHON SCRIPT FOR SCRAPING OIS
 from playwright.sync_api import sync_playwright
 from flask import Flask, jsonify
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 
+CORS(app)
 
 def getLikelySemester(sügisCount, kevadCount):
 
@@ -82,13 +85,16 @@ def scrape_course_semesters(course_code):
         finally:
             browser.close()
 
-@app.route('/course/<course_code>', methods=['GET'])
 
+@app.route('/course/<course_code>', methods=['GET'])
 def course_semesters(course_code):
     result = scrape_course_semesters(course_code)
     return jsonify(result)
 
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
 
 # TODO Better error handling needed but API works
