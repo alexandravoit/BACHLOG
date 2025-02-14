@@ -88,4 +88,20 @@ router.delete('/:id', (req, res) => {
       );
 });
 
+router.put('/:id/season', (req, res) => {
+  const courseId = req.params.id;
+  const { season } = req.body;
+
+  db.run(
+    'UPDATE courses SET season = ? WHERE id = ?',
+    [season, courseId],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ changes: this.changes });
+    }
+  );
+});
+
 module.exports = router;

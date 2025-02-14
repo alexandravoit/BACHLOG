@@ -193,44 +193,60 @@ export default {
 
     async addCourseToSemester(course, semester) {
       try {
-
-        const sem = await this.getSemester(course.code);
-        const season = sem ? sem.conclusion : null;
-        console.log('Fetched season:', season); 
-
-        const payload = {
-          semester,
+        // STEP 1: Create a new course for the frontend
+        const newCourse = {
+          id: Date.now(), // Placeholder ID
           code: course.code,
           title: course.title.et,
           credits: course.credits,
-          season, // Include the season
+          season: "Loading...", // Placeholder until the actual season is fetched
         };
 
-        console.log('Request payload:', payload); // Log the request payload
+        this.semesters[semester - 1].courses.push(newCourse);
 
-        const response = await fetch('http://localhost:3000/api/courses', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+        // STEP 2: Add the course to the database
+        const response = await fetch("http://localhost:3000/api/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            semester,
+            code: course.code,
+            title: course.title.et,
+            credits: course.credits,
+            season: "Loading...", // Placeholder
+          }),
         });
 
-        const newCourse = await response.json();
-        console.log('New course data from backend:', newCourse);
 
-        // Add the new course, USING OG COURSE DATA
-        this.semesters[semester - 1].courses.push({
-          id: newCourse.id, // Use the ID from the API response
-          code: course.code, // Use the original course data
-          title: course.title.et, // Use the original course data
-          credits: course.credits, // Use the original course data
-          season: season, // Include the season
+        if (!response.ok) {
+          throw new Error("Failed to add course to database");
+        }
+
+        const result = await response.json();
+        const courseId = result.id; // Get the actual ID from the database
+
+        // STEP 3: Fetch the actual season
+        const sem = await this.getSemester(course.code);
+        const season = sem ? sem.conclusion : "Unknown";
+
+        // STEP 4: Update season in frontend
+        const courseIndex = this.semesters[semester - 1].courses.findIndex(c => c.code === course.code);
+        if (courseIndex !== -1) {
+          this.semesters[semester - 1].courses[courseIndex].season = season;
+        }
+
+        // STEP 5: Update season in backend
+        await fetch(`http://localhost:3000/api/courses/${courseId}/season`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ season }),
         });
 
-        console.log('Semesters updated array:', this.semesters);
       } catch (error) {
-        console.error('Error adding course:', error);
+        console.error("Error adding course:", error);
       }
     },
+
 
     async moveCourseToSemester(courseId, semester) {
       try {
