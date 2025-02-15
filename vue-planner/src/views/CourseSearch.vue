@@ -31,7 +31,9 @@
     <div class="semester-table" :key="componentKey">
 
       <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
-        <h3>SEMESTER {{ semester.id }} | EAP: {{ getEAP(semester.id) }}</h3>
+        
+        <router-link :to="`/semester/${semester.id}`" class="semesterHeader">SEMESTER {{ semester.id }}</router-link>
+        <p>EAP: {{ getEAP(semester.id) }}</p>
 
         <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)">
 
@@ -62,6 +64,7 @@ import axios from "axios";
 import { forEach } from "lodash";
 
 export default {
+  name: "CourseSearch",
   data() {
     return {
       query: "",
@@ -138,7 +141,9 @@ export default {
           code: course.code,
           title: course.title,
           credits: course.credits,
-          season: course.season, // Include the season
+          season: course.season,
+          grade: course.grade,
+          comments: course.comments,
         }));
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -213,7 +218,7 @@ export default {
             code: course.code,
             title: course.title.et,
             credits: course.credits,
-            season: "Loading...", // Placeholder
+            season: "Ootel...", // Placeholder
           }),
         });
 
@@ -227,7 +232,7 @@ export default {
 
         // STEP 3: Fetch the actual season
         const sem = await this.getSemester(course.code);
-        const season = sem ? sem.conclusion : "Unknown";
+        const season = sem ? sem.conclusion : "mdea";
 
         // STEP 4: Update season in frontend
         const courseIndex = this.semesters[semester - 1].courses.findIndex(c => c.code === course.code);
@@ -308,7 +313,9 @@ export default {
       alert(`
         ${course.title} (${course.code})
         ${course.credits} EAP
-        SEASON: ${course.season}
+        SEMSTER: ${course.season}
+        HINNE: ${ course.grade ? course.grade : "Puudub"}
+        KOMMENTAAR: ${ course.comments ? course.comments : "Puudub"}
       `);
     },
 
@@ -445,10 +452,16 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.semester h3 {
-  font-size: 18px;
-  margin: 0 0 10px 0;
-  color: #333;
+.semesterHeader {
+  font-size: x-large;
+  font-weight: bold;
+  text-decoration: none; 
+  color: inherit; 
+  cursor: pointer; 
+}
+
+.semesterHeader:hover {
+  color: aquamarine;
 }
 
 .drop-zone {

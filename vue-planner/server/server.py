@@ -11,11 +11,11 @@ CORS(app)
 def getLikelySemester(sügisCount, kevadCount):
 
     if sügisCount > kevadCount:
-        return "autumn"
+        return "sügis"
     elif kevadCount > sügisCount:
-        return "spring"
+        return "kevad"
     else:
-        return "both"
+        return "mõlemad"
 
 def scrape_course_semesters(course_code):
     with sync_playwright() as p:
