@@ -41,6 +41,7 @@
             v-for="(course, courseIndex) in semester.courses"
             :key="courseIndex"
             class="course-box"
+            :class="{ 'invalid-course': !isValidSemester(course, semester.id) && course.season !== 'Loading...' }"
             draggable="true"
             @dragstart="handleCourseDragStart($event, index, courseIndex)"
             @click="showCourseDetails(course)"
@@ -345,6 +346,24 @@ export default {
       }
     },
 
+    isValidSemester(course, semesterId) {
+      const isAutumnCourse = course.season === 'sügis';
+      const isSpringCourse = course.season === 'kevad';
+
+      // Autumn course are 1,3,5
+      if (isAutumnCourse && semesterId % 2 !== 0) {
+        return true;
+      }
+
+      // Spring courses are 2, 4, 6
+      if (isSpringCourse && semesterId % 2 == 0) {
+        return true;
+      }
+
+      return false;
+    },
+
+
 
   }
 };
@@ -550,6 +569,12 @@ export default {
 
 .delete-btn:hover {
   color: #ffffff;
+}
+
+.invalid-course {
+  background-color: #ffebee; /* Light red background */
+  border: 2px solid #ff6b6b; /* Red border */
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3); /* Red shadow */
 }
 
 input {

@@ -45,8 +45,6 @@ def scrape_course_semesters(course_code):
                     return options.map(option => option.innerText.trim());
                 }''')
 
-                print(versions)
-
                 sügisCount = 0
                 kevadCount = 0
 
