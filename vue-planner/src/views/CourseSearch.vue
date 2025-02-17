@@ -41,7 +41,7 @@
             v-for="(course, courseIndex) in semester.courses"
             :key="courseIndex"
             class="course-box"
-            :class="{ 'invalid-course': !isValidSemester(course, semester.id) && course.season !== 'Loading...' }"
+            :class="{ 'invalid-courseSem': (!isValidSemester(course, semester.id) && course.season !== 'Loading...') || !prerequisiteStatus[course.code] }"
             draggable="true"
             @dragstart="handleCourseDragStart($event, index, courseIndex)"
             @click="showCourseDetails(course)"
@@ -75,7 +75,8 @@ export default {
       semesters: Array.from({ length: 6 }, (_, i) => ({
         id: i + 1,
         courses: [],
-      }))
+      })),
+      eeldused: {}, // Format (courseCode: [prerequisite1, prerequisite2, ...])
     };
   },
 
@@ -86,8 +87,23 @@ export default {
     }
   },
 
+  computed: {
+    prerequisiteStatus() {
+      const status = {};
+      for (const semester of this.semesters) {
+        for (const course of semester.courses) {
+          // Only check prerequisites if not already cached
+          if (!this.eeldused[course.code]) {
+            status[course.code] = this.eeldusedOlemas(course, semester.id);
+          } else {
+            status[course.code] = this.kasLäbitud(semester.id, this.eeldused[course.code]);
+          }
+        }
+      }
+      return status;
+    },
+  },
 
-  
   methods: {
     // SEARCH COURSES
     async searchCourses() {
@@ -100,8 +116,6 @@ export default {
               take: 20 // How many courses to fetch
             }
           });
-          console.log("API Response:", response.data);
-          console.log("Course count:", response.data.length);
 
           if (response.data && Array.isArray(response.data)) {
             this.courses = response.data.slice(0, response.data.length);
@@ -219,10 +233,9 @@ export default {
             code: course.code,
             title: course.title.et,
             credits: course.credits,
-            season: "Ootel...", // Placeholder
+            season: "Loading...", // Placeholder
           }),
         });
-
 
         if (!response.ok) {
           throw new Error("Failed to add course to database");
@@ -252,7 +265,6 @@ export default {
         console.error("Error adding course:", error);
       }
     },
-
 
     async moveCourseToSemester(courseId, semester) {
       try {
@@ -363,8 +375,65 @@ export default {
       return false;
     },
 
+    async eeldusedOlemas(course, semesterId) {
+      if (this.eeldused[course.code]) {
+        return this.kasLäbitud(semesterId, this.eeldused[course.code]);
+      }
 
+      try {
+        const response = await fetch(`https://ois2.ut.ee/api/courses/${course.code}`);
+        const courseDetails = await response.json();
 
+        const additional_info = courseDetails.additional_info;
+
+        // KUI POLE PREREQ LAHTRIT SIIS KÕIK TIMMIS
+        if (!additional_info.prerequisites) {
+          console.log("Eeldused puuduvad");
+          return true;
+        } else {
+          const prereqs = additional_info.prerequisites;
+
+          const mainPre = prereqs[0].code;
+          const altPres = prereqs[0].alternatives;
+
+          const eeldused = [];
+          eeldused.push(mainPre);
+
+          forEach(altPres, (altPre) => {
+            eeldused.push(altPre.code);
+          });
+
+          // Cache
+          this.eeldused[course.code] = eeldused;
+
+          return this.kasLäbitud(semesterId, eeldused);
+        }
+      } catch (error) {
+        console.error('Error fetching prerequisites:', error);
+        return false;
+      }
+    },
+
+    kasLäbitud(semesterId, eeldused) {
+      let korras = false; 
+
+      // Loop through all prerequisites
+      for (const eeldus of eeldused) {
+        // Check if the prerequisite or any of its alternatives has been completed in previous semesters
+        for (let i = 0; i < semesterId; i++) {
+          for (const course of this.semesters[i].courses) {
+            if (course.code === eeldus) {
+              korras = true; 
+              break;
+            }
+          }
+          if (korras) break; // Exit the middle loop if prerequisite is found
+        }
+        if (korras) break; // Exit the outer loop if prerequisite is found
+      }
+
+      return korras;
+    },
   }
 };
 </script>
@@ -571,10 +640,16 @@ export default {
   color: #ffffff;
 }
 
-.invalid-course {
+.invalid-courseSem {
   background-color: #ffebee; /* Light red background */
   border: 2px solid #ff6b6b; /* Red border */
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3); /* Red shadow */
+}
+
+.invalid-coursePre {
+  background-color: #fff9eb; /* Light red background */
+  border: 2px solid #d4a331; /* Red border */
+  box-shadow: 0 2px 8px rgba(238, 119, 7, 0.3); /* Red shadow */
 }
 
 input {
