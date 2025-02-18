@@ -7,7 +7,7 @@
       @input="searchCourses"
     />
     <div v-if="courses.length > 0">
-      <h3>LEITUD KURSUSED:</h3>
+      <h1 class="leitud">LEITUD KURSUSED:</h1>
       <div class="kursused">
         <div 
           v-for="course in courses" 
@@ -112,7 +112,7 @@ input {
 }
 
 .kursus:hover {
-  background-color: aquamarine;
+  border: #333 solid 1px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   animation: floatAnimation 1.5s ease-in-out infinite;
 }
@@ -152,5 +152,10 @@ input {
   50% {
     transform: translateY(-10px);
   }
+}
+
+.leitud {
+    color: white;
+    -webkit-text-stroke: 1px #333;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <h2>KURSUSE OTSING</h2>
+    <h1>KURSUSE OTSING</h1>
     <CourseSearchInput :handleDragStart="handleDragStart" />
     <SemesterTable
       :semesters="semesters"
@@ -238,8 +238,4 @@ export default {
     padding: 20px;
   }
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
 </style>

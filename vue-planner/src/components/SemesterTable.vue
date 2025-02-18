@@ -8,7 +8,7 @@
           v-for="(course, courseIndex) in semester.courses"
           :key="courseIndex"
           class="course-box"
-          :class="{ 'invalid-courseSem': (!isValidSemester(course, semester.id) && course.season !== 'Loading...') || !prerequisiteStatus[course.code] }"
+          :class="{ 'invalid-course': (!isValidSemester(course, semester.id) && course.season !== 'Loading...') || !prerequisiteStatus[course.code] }"
           draggable="true"
           @dragstart="handleCourseDragStart($event, index, courseIndex)"
           @click="showCourseDetails(course)"
@@ -65,7 +65,8 @@ export default {
 }
 
 .semesterHeader:hover {
-  color: aquamarine;
+    color: white;
+    -webkit-text-stroke: 1px #333;
 }
 
 .drop-zone {
@@ -105,7 +106,7 @@ export default {
 .course-box:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: aquamarine;
+  border: #333 solid 1px;
 }
 
 .course-box p {
@@ -153,18 +154,14 @@ export default {
 }
 
 .delete-btn:hover {
-  color: #ffffff;
+  -webkit-text-stroke: 1px #333;
 }
 
-.invalid-courseSem {
-  background-color: #ffebee;
-  border: 2px solid #ff6b6b;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+.invalid-course {
+  border: 1px dashed #bc0707;
 }
 
-.invalid-coursePre {
-  background-color: #fff9eb;
-  border: 2px solid #d4a331;
-  box-shadow: 0 2px 8px rgba(238, 119, 7, 0.3);
+.invalid-course:hover {
+  border: 1px solid #bc0707;
 }
 </style>

@@ -1,13 +1,20 @@
 <template>
-    <div>
-      <h2>BACHLOG! NAGU BACKLOG! AGA BAKALAUREUSELE!</h2>
-      <p>Siia peaks tekkima mingid õpetused moodulitest ja valikutest</p>
-    </div>
-  </template>
+  <div>
+    <h1>BACHLOG EHK SU BAKA BACKLOG!</h1>
+    <p class="bold">Backlog ehk "an accumulation of uncompleted work or matters needing to be dealt with"</p>
+    <p>Siia peaks tekkima mingid õpetused moodulitest ja valikutest</p>
   
-  <script>
-  export default {
-    name: "HomeView",
-  };
-  </script>
-  
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeView",
+};
+</script>
+
+<style scoped>
+  .bold {
+    font-weight: bold;
+  }
+</style>

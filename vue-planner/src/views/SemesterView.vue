@@ -1,7 +1,6 @@
 <template>
     <div class="semester-view">
-      <h2>SEMESTER {{ semesterId }}</h2>
-      <p>ÜLEVAADE:</p>
+      <h1>SEMESTER {{ semesterId }}</h1>
       <table>
         <thead>
           <tr>
@@ -84,7 +83,7 @@ export default {
         // Save course details using the utility function
         await saveCourseDetails(course.id, {
           grade: course.grade,
-          comments: course.comments,
+          comments: course.comments.replace(/\\/g, ''), // Remove any backslashes
         });
         alert("Kursuse andmed on salvestatud!");
       } catch (error) {
@@ -110,13 +109,14 @@ export default {
     }
 
     th,td {
-        border: 1px solid #ddd;
+        border: 1px solid #333;
         padding: 8px;
         text-align: left;
     }
 
     th {
-        background-color: #f2f2f2;
+        color: white;
+        background-color: #333;
     }
 
     input, select {
@@ -127,15 +127,16 @@ export default {
 
     button {
         padding: 5px 10px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
+        color: #333;
+        border: #333 solid 1px;
+        background-color: white;
         border-radius: 4px;
         cursor: pointer;
     }
 
     button:hover {
-        background-color: #45a049;
+      color: white;
+      background-color: #333;
     }
 
 </style>

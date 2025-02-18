@@ -3,12 +3,11 @@
 
     <div class="header">
 
-      <a>BACHLOG</a>
-      <router-link to="/search">PLANEERIJA</router-link>
+      <p>BACHLOG</p>
       <router-link to="/">KODU</router-link>
+      <router-link to="/stats">STATID</router-link>
+      <router-link to="/search">PLANEERIJA</router-link>
       
-
-
     </div>
     
     <router-view />
@@ -54,7 +53,7 @@ export default {
   padding: 20px;
   gap: 20px;
 
-  color: aquamarine;
+  color: #333;
   font-size: xx-large;
   font-weight: bold;
   text-decoration: none;
@@ -63,6 +62,12 @@ export default {
 .header a {
   text-decoration: none; 
   color: inherit; 
+}
+
+.header a:hover {
+  text-decoration: none; 
+  color: white;
+  -webkit-text-stroke: 1px #333;
 }
 
 </style>
