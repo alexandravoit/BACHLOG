@@ -39,66 +39,62 @@
   </template>
   
   <script>
-  export default {
-    name: "SemesterView",
-    data() {
-      return {
-        semesterId: this.$route.params.id, // Get semesterId from route params
-        courses: [], // Array to store courses for the semester
-        grades: [1, 2, 3, 4, 5], // Available grades
-      };
-    },
-    async mounted() {
-      await this.fetchCourses(); // Fetch courses when the component is mounted
-    },
-    watch: {
-      // Watch for changes in the route params (e.g., when navigating between semesters)
-      "$route.params.id": {
-        immediate: true,
-        handler(newId) {
-          this.semesterId = newId; // Update semesterId
-          this.fetchCourses(); // Re-fetch courses
-        },
+import { fetchCoursesForSemester, saveCourseDetails } from "@/utils/utils";
+
+export default {
+  name: "SemesterView",
+  data() {
+    return {
+      semesterId: this.$route.params.id, // Get semesterId from route params
+      courses: [], // Array to store courses for the semester
+      grades: [1, 2, 3, 4, 5], // Available grades
+      loading: false, // Loading state
+      error: null, // Error message
+    };
+  },
+  async mounted() {
+    await this.fetchCourses(); // Fetch courses when the component is mounted
+  },
+  watch: {
+    // Watch for changes in the route params (e.g., when navigating between semesters)
+    "$route.params.id": {
+      immediate: true,
+      handler(newId) {
+        this.semesterId = newId; // Update semesterId
+        this.fetchCourses(); // Re-fetch courses
       },
     },
-    methods: {
-      async fetchCourses() {
-        try {
-          // Fetch courses for the current semester
-          const response = await fetch(`http://localhost:3000/api/courses?semester=${this.semesterId}`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          this.courses = await response.json(); // Update the courses array
-        } catch (error) {
-          console.error("Error fetching courses:", error);
-        }
-      },
-      async saveCourse(course) {
-        try {
-          // Update both grade and comments in a single request
-          const response = await fetch(`http://localhost:3000/api/courses/${course.id}/details`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              grade: course.grade,
-              comments: course.comments,
-            }),
-          });
-  
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-  
-          alert("Kursuse andmed on salvestatud!");
-        } catch (error) {
-          console.error("Error saving course details:", error);
-          alert("Kursuse andmete salvestamine ebaõnnestus. Palun proovi uuesti.");
-        }
-      },
+  },
+  methods: {
+    async fetchCourses() {
+      this.loading = true;
+      this.error = null;
+      try {
+        // Fetch courses using the utility function
+        this.courses = await fetchCoursesForSemester(this.semesterId);
+      } catch (error) {
+        this.error = "Kursuste laadimine ebaõnnestus. Palun proovi uuesti.";
+        console.error("Error fetching courses:", error);
+      } finally {
+        this.loading = false;
+      }
     },
-  };
-  </script>
+    async saveCourse(course) {
+      try {
+        // Save course details using the utility function
+        await saveCourseDetails(course.id, {
+          grade: course.grade,
+          comments: course.comments,
+        });
+        alert("Kursuse andmed on salvestatud!");
+      } catch (error) {
+        console.error("Error saving course details:", error);
+        alert("Kursuse andmete salvestamine ebaõnnestus. Palun proovi uuesti.");
+      }
+    },
+  },
+};
+</script>
   
 <style scoped>
     .semester-view {
@@ -110,7 +106,7 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
+        margin: 20px;
     }
 
     th,td {
