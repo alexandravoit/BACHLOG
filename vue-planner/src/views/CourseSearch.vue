@@ -36,6 +36,7 @@ export default {
       })),
       componentKey: 0,
       eeldused: {},
+      courseProblems: {},
     };
   },
   async created() {
@@ -161,12 +162,28 @@ export default {
       }
     },
     showCourseDetails(course) {
+      const problems = this.courseProblems[course.code] || {};
+      const problemMessages = [];
+
+      if (problems.wrongSemester) {
+        problemMessages.push("⚠️ Aine vales semestris.");
+      }
+      if (problems.missingPrerequisites) {
+        problemMessages.push("⚠️ Eeldusained läbimata.");
+        problemMessages.push(`Üks eeldusainetest peab olema läbitud: ${this.eeldused[course.code].join(", ")}`);
+      }
+
+      const problemMessage = problemMessages.length > 0
+        ? `\n\nPROBLEMS:\n${problemMessages.join("\n")}`
+        : "";
+
       alert(`
         ${course.title} (${course.code})
         ${course.credits} EAP
         SEMSTER: ${course.season}
         HINNE: ${ course.grade ? course.grade : "Puudub"}
-        KOMMENTAAR: ${ course.comments ? course.comments : "Puudub"}
+        KOMMENTAAR: ${course.comments ? course.comments : "Puudub"}
+        ${problemMessage}
       `);
     },
     getEAP(semesterId) {
@@ -178,29 +195,58 @@ export default {
       return eap;
     },
     isValidSemester(course, semesterId) {
-      return isValidSemester(course, semesterId);
+      const isValid = isValidSemester(course, semesterId);
+
+      if (!isValid) {
+        if (!this.courseProblems[course.code]) {
+          this.courseProblems[course.code] = {};
+        }
+        this.courseProblems[course.code].wrongSemester = true;
+      } else {
+        if (!this.courseProblems[course.code]) {
+          this.courseProblems[course.code] = {};
+        }
+        this.courseProblems[course.code].wrongSemester = false;
+      }
+
+      return isValid;
     },
     async eeldusedOlemas(course, semesterId) {
       if (this.eeldused[course.code]) {
-        return this.kasLäbitud(semesterId, this.eeldused[course.code]);
+        const prerequisitesMet = this.kasLäbitud(semesterId, this.eeldused[course.code]);
+
+        if (!this.courseProblems[course.code]) {
+          this.courseProblems[course.code] = {};
+        }
+
+        this.courseProblems[course.code].missingPrerequisites = !prerequisitesMet;
+
+        return prerequisitesMet;
       }
       try {
         const response = await fetch(`https://ois2.ut.ee/api/courses/${course.code}`);
         const courseDetails = await response.json();
         const additional_info = courseDetails.additional_info;
+
+        if (!this.courseProblems[course.code]) {
+          this.courseProblems[course.code] = {};
+        }
+
         if (!additional_info.prerequisites) {
+          this.courseProblems[course.code].missingPrerequisites = false;
           return true;
         } else {
           const prereqs = additional_info.prerequisites;
           const mainPre = prereqs[0].code;
           const altPres = prereqs[0].alternatives;
-          const eeldused = [];
-          eeldused.push(mainPre);
-          forEach(altPres, (altPre) => {
-            eeldused.push(altPre.code);
-          });
+          const eeldused = [mainPre, ...altPres.map(alt => alt.code)];
+
           this.eeldused[course.code] = eeldused;
-          return this.kasLäbitud(semesterId, eeldused);
+          const prerequisitesMet = this.kasLäbitud(semesterId, eeldused);
+          
+          this.courseProblems[course.code].missingPrerequisites = !prerequisitesMet;
+          
+          return prerequisitesMet;
         }
       } catch (error) {
         console.error('Error fetching prerequisites:', error);
