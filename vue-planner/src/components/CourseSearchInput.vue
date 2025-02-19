@@ -48,7 +48,7 @@ export default {
             params: {
               code: this.query.toUpperCase(),
               take: 20,
-              states: ["confirmed", "closed"],
+              states: ["confirmed"],
             },
           });
           if (response.data && Array.isArray(response.data)) {
