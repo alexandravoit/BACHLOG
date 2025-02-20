@@ -10,6 +10,7 @@ export async function fetchCoursesForSemester(semester) {
       season: course.season,
       grade: course.grade,
       comments: course.comments,
+      type: course.type,
     }));
   } catch (error) {
     console.error('Error fetching courses:', error);

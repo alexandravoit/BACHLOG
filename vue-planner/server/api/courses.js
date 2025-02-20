@@ -73,6 +73,7 @@ router.put('/:id/details', (req, res) => {
   );
 });
 
+// Delete course
 router.delete('/:id', (req, res) => {
     const courseId = req.params.id;
 
@@ -88,6 +89,7 @@ router.delete('/:id', (req, res) => {
       );
 });
 
+// Update season
 router.put('/:id/season', (req, res) => {
   const courseId = req.params.id;
   const { season } = req.body;
@@ -103,5 +105,40 @@ router.put('/:id/season', (req, res) => {
     }
   );
 });
+
+// Update a course's type
+router.put('/:id/type', (req, res) => {
+  const courseId = req.params.id;
+  const { type } = req.body;
+
+  db.run(
+    'UPDATE courses SET type = ? WHERE id = ?',
+    [type, courseId],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.get(
+        'SELECT * FROM courses WHERE id = ?',
+        [courseId],
+        (err, row) => {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+
+          if (!row) {
+            return res.status(404).json({ error: 'Course not found' });
+          }
+
+          res.json(row);
+        }
+      );
+    }
+  );
+});
+
+
+
 
 module.exports = router;

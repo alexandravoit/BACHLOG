@@ -8,6 +8,7 @@
           v-for="(course, courseIndex) in semester.courses"
           :key="courseIndex"
           class="course-box"
+          :style="{ backgroundColor: typeToColor[course.type] }"
           :class="{ 'invalid-course': (!isValidSemester(course, semester.id) && course.season !== 'Loading...') || !prerequisiteStatus[course.code] }"
           draggable="true"
           @dragstart="handleCourseDragStart($event, index, courseIndex)"
@@ -23,6 +24,14 @@
 </template>
 
 <script>
+const typeToColor = {
+  määramata: '#e0e1dd',
+  kohustuslik: '#0d1b2a',
+  valikaine: '#1B263B',  
+  vabaaine: '#415a77',   
+  moodul1: '#778da9',    
+  moodul2: '#ACB7C3',    
+};
 
 export default {
   name: "SemesterTable",
@@ -36,6 +45,11 @@ export default {
     deleteCourse: Function,
     getEAP: Function,
     isValidSemester: Function,
+  },
+  data() {
+    return {
+      typeToColor,
+    };
   },
 };
 </script>
@@ -86,7 +100,6 @@ export default {
 }
 
 .course-box {
-  background-color: #ffffff;
   padding: 10px;
   border-radius: 10px;
   cursor: move;
@@ -106,14 +119,13 @@ export default {
 .course-box:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: #333 solid 1px;
 }
 
 .course-box p {
+  color: white;
   margin: 0;
   font-size: 14px;
   font-weight: bold;
-  color: #333;
   transition: opacity 0.3s ease;
 }
 
@@ -142,7 +154,7 @@ export default {
   top: 3px;
   right: 3px;
   cursor: pointer;
-  color: #333;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,11 +166,20 @@ export default {
 }
 
 .delete-btn:hover {
-  -webkit-text-stroke: 1px #333;
+  color: #bc0707;
+}
+
+@keyframes floatAnimation {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .invalid-course {
-  border: 1px dashed #bc0707;
+  animation: floatAnimation 1.5s ease-in-out infinite;
 }
 
 .invalid-course:hover {

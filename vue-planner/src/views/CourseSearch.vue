@@ -13,6 +13,16 @@
       :getEAP="getEAP"
       :isValidSemester="isValidSemester"
     />
+
+    <CourseDetailsModal
+      v-if="isModalVisible"
+      :course="selectedCourse"
+      :problems="courseProblems[selectedCourse.code] || {}"
+      :isVisible="isModalVisible"
+      @update-type="updateCourseType"
+      @close-modal="closeModal"
+    />
+
   </div>
 </template>
 
@@ -20,6 +30,7 @@
 import CourseSearchInput from "@/components/CourseSearchInput.vue";
 import SemesterTable from "@/components/SemesterTable.vue";
 import { fetchCoursesForSemester, updateCourseSemester, getSemester, isValidSemester } from "@/utils/utils";
+import CourseDetailsModal from "@/components/CourseDetailsModal.vue";
 import { forEach } from "lodash";
 
 export default {
@@ -27,6 +38,7 @@ export default {
   components: {
     CourseSearchInput,
     SemesterTable,
+    CourseDetailsModal,
   },
   data() {
     return {
@@ -37,6 +49,8 @@ export default {
       componentKey: 0,
       eeldused: {},
       courseProblems: {},
+      selectedCourse: null,
+      isModalVisible: false,
     };
   },
   async created() {
@@ -91,6 +105,7 @@ export default {
           title: course.title.et,
           credits: course.credits,
           season: "Loading...",
+          type: "määramata",
         };
         this.semesters[semester - 1].courses.push(newCourse);
         const response = await fetch("http://localhost:3000/api/courses", {
@@ -102,6 +117,7 @@ export default {
             title: course.title.et,
             credits: course.credits,
             season: "Loading...",
+            type: "määramata",
           }),
         });
         if (!response.ok) {
@@ -161,31 +177,7 @@ export default {
         console.error('Error deleting course:', error);
       }
     },
-    showCourseDetails(course) {
-      const problems = this.courseProblems[course.code] || {};
-      const problemMessages = [];
-
-      if (problems.wrongSemester) {
-        problemMessages.push("⚠️ Aine vales semestris.");
-      }
-      if (problems.missingPrerequisites) {
-        problemMessages.push("⚠️ Eeldusained läbimata.");
-        problemMessages.push(`Üks eeldusainetest peab olema läbitud: ${this.eeldused[course.code].join(", ")}`);
-      }
-
-      const problemMessage = problemMessages.length > 0
-        ? `\n\nPROBLEMS:\n${problemMessages.join("\n")}`
-        : "";
-
-      alert(`
-        ${course.title} (${course.code})
-        ${course.credits} EAP
-        SEMSTER: ${course.season}
-        HINNE: ${ course.grade ? course.grade : "Puudub"}
-        KOMMENTAAR: ${course.comments ? course.comments : "Puudub"}
-        ${problemMessage}
-      `);
-    },
+    
     getEAP(semesterId) {
       let eap = 0;
       let courses = this.semesters[semesterId - 1].courses;
@@ -269,6 +261,36 @@ export default {
       }
       return korras;
     },
+
+    showCourseDetails(course) {
+      this.selectedCourse = course;
+      this.isModalVisible = true; 
+    },
+
+    closeModal() {
+      this.isModalVisible = false; 
+      this.selectedCourse = null; 
+    },
+
+    updateCourseType(newType) {
+
+      if (this.selectedCourse) {
+
+        this.selectedCourse.type = newType;
+
+        for (const semester of this.semesters) {
+          const courseIndex = semester.courses.findIndex(c => c.id === this.selectedCourse.id);
+          if (courseIndex !== -1) {
+            semester.courses[courseIndex].type = newType;
+            break;
+          }
+        }
+
+        this.componentKey += 1;
+      }
+    },
+
+
   },
 };
 </script>
