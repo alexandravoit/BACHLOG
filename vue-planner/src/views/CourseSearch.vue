@@ -127,8 +127,10 @@ export default {
         const courseId = result.id;
         const sem = await getSemester(course.code);
         const season = sem ? sem.conclusion : "N/A";
+
         const courseIndex = this.semesters[semester - 1].courses.findIndex(c => c.code === course.code);
         if (courseIndex !== -1) {
+          this.semesters[semester - 1].courses[courseIndex].id = courseId;
           this.semesters[semester - 1].courses[courseIndex].season = season;
         }
         await fetch(`http://localhost:3000/api/courses/${courseId}/season`, {
@@ -136,6 +138,7 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ season }),
         });
+        this.componentKey += 1;
       } catch (error) {
         console.error("Error adding course:", error);
       }

@@ -25,11 +25,11 @@ router.get('/', (req, res) => {
 
 // Add a new course
 router.post('/', (req, res) => {
-  const { semester, code, title, credits, season } = req.body;
+  const { semester, code, title, credits, season, type } = req.body;
 
   db.run(
-    'INSERT INTO courses (semester, code, title, credits, season) VALUES (?, ?, ?, ?, ?)',
-    [semester, code, title, credits, season],
+    'INSERT INTO courses (semester, code, title, credits, season, type) VALUES (?, ?, ?, ?, ?, ?)',
+    [semester, code, title, credits, season, type],
     function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });

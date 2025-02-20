@@ -91,7 +91,12 @@
 
             const updatedCourse = await response.json();
 
+            console.log('API Response:', updatedCourse); // Log the full response
+
             this.$emit('update-type', updatedCourse.type); // Emit the type
+
+            console.log('Emitted update-type event with type:', updatedCourse.type);
+
 
         } catch (error) {
             console.error('Error updating course type:', error);
