@@ -1,14 +1,86 @@
 <template>
-    <div>
-        <h1>STATID</h1>
-        <p>Siia tuleb statistika nagu keskmine hinne, probleemid planeerimisega jne</p>
+    <div class="stats-page">
+      <h1>STATID</h1>
+
+      <h2>KAALUTUD KESKMINE:</h2>
+      <div class="gradeStats">
+
+      </div>
+
+
+      <h2>MOODULITE TÄITMINE:</h2>
+      <div class="typeStats">
+
+        <div v-for="(eap, type) in eapStats" :key="type">
+        <p> {{ type }} :  {{ eap }} : {{ getPercent(type, eap) }}%</p>
+        </div>
+
+      </div>
+
+      
+
+    
     </div>
-</template>
+  </template>
+  
+  <script>
+  export default {
+    data() {
+      return {
+        eapStats: {},
+        avgGrade: 0,
+      };
+    },
+    async created() {
+      await this.fetchEapStats();
+      //await this.fetchAvergae();
+    },
+    methods: {
+      async fetchEapStats() {
+        try {
+          const response = await fetch('http://localhost:3000/api/courses/stats/eap-by-type');
+          if (!response.ok) {
+            throw new Error('Failed to fetch EAP stats');
+          }
+          this.eapStats = await response.json();
+        } catch (error) {
+          console.error('Error fetching EAP stats:', error);
+        }
+      },
 
-<script>
+      async fetchAvergae() {
+        try {
+          const response = await fetch('http://localhost:3000/api/courses/stats/average');
+          if (!response.ok) {
+            throw new Error('Failed to fetch average grade');
+          }
+          this.avgGrade = await response.json();
+        } catch (error) {
+          console.error('Error fetching average grade:', error);
+        }
+      },
 
-</script>
+      getPercent(type, eap) {
+        const whole = {
+            määramata: 0.000001,
+            kohustuslik: 60,
+            valikaine: 12,  
+            vabaaine: 9,   
+            moodul1: 24,    
+            moodul2: 24,
+        };
+        return eap / whole[type] * 100;
+      }
+    },
+  };
+  </script>
+  
+  <style scoped>
 
-<style scoped>
+  .typeStats {
+    border: 1px black solid;
+  }
 
-</style>
+
+
+  </style>

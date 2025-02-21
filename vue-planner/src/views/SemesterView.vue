@@ -34,6 +34,8 @@
           </tr>
         </tbody>
       </table>
+
+      <h2>TÄITMINE NOMINAALMAHUST:</h2>
     </div>
   </template>
   

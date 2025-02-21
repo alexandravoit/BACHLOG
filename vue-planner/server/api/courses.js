@@ -138,6 +138,54 @@ router.put('/:id/type', (req, res) => {
   );
 });
 
+// Get EAPs by type
+router.get('/stats/eap-by-type', (req, res) => {
+  const query = `
+    SELECT type, SUM(credits) as totalEAP
+    FROM courses
+    GROUP BY type
+  `;
+
+  
+  db.all(query, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const stats = rows.reduce((acc, row) => {
+      acc[row.type] = row.totalEAP;
+      return acc;
+    }, {});
+
+    
+    const types = ['kohustuslik', 'valikaine', 'vabaaine', 'moodul1', 'moodul2', 'määramata'];
+    for (let index = 0; index < types.length; index++) {
+      const element = types[index];
+      if (!stats[element]) {
+        stats[element] = 0;
+      }
+    }
+
+    console.log("Stats:", stats);
+    res.json(stats);
+  });
+});
+
+
+// Get average grade
+
+/* router.get('/stats/eap-by-type', (req, res) => {
+  const query = `
+    SELECT *, SUM(grade * credits) as totalEAP
+    FROM courses
+    GROUP BY type
+  `;
+
+  
+  db.all(query, (err, rows) => {
+    
+  });
+}); */
 
 
 

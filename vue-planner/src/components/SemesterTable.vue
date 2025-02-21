@@ -179,10 +179,11 @@ export default {
 }
 
 .invalid-course {
+  background-color: #FB6376 !important;
   animation: floatAnimation 1.5s ease-in-out infinite;
 }
 
 .invalid-course:hover {
-  border: 1px solid #bc0707;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>
