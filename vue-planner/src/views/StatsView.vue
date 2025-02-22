@@ -4,6 +4,7 @@
 
       <h2>KAALUTUD KESKMINE:</h2>
       <div class="gradeStats">
+        <p> {{ avgGrade }}</p>
 
       </div>
 
@@ -12,7 +13,8 @@
       <div class="typeStats">
 
         <div v-for="(eap, type) in eapStats" :key="type">
-        <p> {{ type }} :  {{ eap }} : {{ getPercent(type, eap) }}%</p>
+            <p v-if="type === 'määramata'"> {{ type }}  {{ eap }}</p>
+            <p v-else> {{ type }} ehk  {{ eap }} {{ getPercent(type, eap) }}%</p>
         </div>
 
       </div>
@@ -33,7 +35,7 @@
     },
     async created() {
       await this.fetchEapStats();
-      //await this.fetchAvergae();
+      await this.fetchAvergae();
     },
     methods: {
       async fetchEapStats() {
@@ -54,7 +56,8 @@
           if (!response.ok) {
             throw new Error('Failed to fetch average grade');
           }
-          this.avgGrade = await response.json();
+          const avg = await response.json();
+          this.avgGrade = avg.average;
         } catch (error) {
           console.error('Error fetching average grade:', error);
         }
@@ -62,7 +65,6 @@
 
       getPercent(type, eap) {
         const whole = {
-            määramata: 0.000001,
             kohustuslik: 60,
             valikaine: 12,  
             vabaaine: 9,   

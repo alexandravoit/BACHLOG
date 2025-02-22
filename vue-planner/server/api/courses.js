@@ -173,19 +173,20 @@ router.get('/stats/eap-by-type', (req, res) => {
 
 
 // Get average grade
-
-/* router.get('/stats/eap-by-type', (req, res) => {
+router.get('/stats/average', (req, res) => {
   const query = `
-    SELECT *, SUM(grade * credits) as totalEAP
+    SELECT SUM(grade * credits) / SUM(credits) as average
     FROM courses
-    GROUP BY type
   `;
 
-  
-  db.all(query, (err, rows) => {
-    
+  db.get(query, (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.json({ average: row.average });
   });
-}); */
+});
 
 
 

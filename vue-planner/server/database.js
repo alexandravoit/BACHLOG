@@ -20,7 +20,7 @@ db.serialize(() => {
       credits INTEGER,
       season TEXT,
       comments TEXT,
-      grade TEXT,
+      grade INTEGER,
       type TEXT
     )
   `, (err) => {
