@@ -34,8 +34,6 @@
           </tr>
         </tbody>
       </table>
-
-      <h2>TÄITMINE NOMINAALMAHUST:</h2>
     </div>
   </template>
   
@@ -46,23 +44,22 @@ export default {
   name: "SemesterView",
   data() {
     return {
-      semesterId: this.$route.params.id, // Get semesterId from route params
-      courses: [], // Array to store courses for the semester
-      grades: [1, 2, 3, 4, 5], // Available grades
-      loading: false, // Loading state
-      error: null, // Error message
+      semesterId: this.$route.params.id, 
+      courses: [],
+      grades: [1, 2, 3, 4, 5],
+      loading: false, 
+      error: null,
     };
   },
   async mounted() {
-    await this.fetchCourses(); // Fetch courses when the component is mounted
+    await this.fetchCourses(); 
   },
   watch: {
-    // Watch for changes in the route params (e.g., when navigating between semesters)
     "$route.params.id": {
       immediate: true,
       handler(newId) {
-        this.semesterId = newId; // Update semesterId
-        this.fetchCourses(); // Re-fetch courses
+        this.semesterId = newId; 
+        this.fetchCourses(); 
       },
     },
   },
@@ -71,7 +68,6 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        // Fetch courses using the utility function
         this.courses = await fetchCoursesForSemester(this.semesterId);
       } catch (error) {
         this.error = "Kursuste laadimine ebaõnnestus. Palun proovi uuesti.";
@@ -82,7 +78,6 @@ export default {
     },
     async saveCourse(course) {
       try {
-        // Save course details using the utility function
         await saveCourseDetails(course.id, {
           grade: course.grade,
           comments: course.comments.replace(/\\/g, ''), // Remove any backslashes

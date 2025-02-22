@@ -8,10 +8,8 @@
         <p v-if="course.comments"><strong>Kommentaar:</strong> {{ course.comments }}</p>
   
         <div v-if="problemMessages.length > 0" class="problems">
-          <h3>Probleemid:</h3>
-          <ul>
-            <li v-for="message in problemMessages" :key="message">{{ message }}</li>
-          </ul>
+            <h3>Probleemid:</h3>
+            <p v-for="message in problemMessages" :key="message">{{ message }}</p>
         </div>
   
         <div class="type-selector">
@@ -64,10 +62,10 @@
       problemMessages() {
         const messages = [];
         if (this.problems.wrongSemester) {
-          messages.push("⚠️ Aine vales semestris.");
+          messages.push("Aine vales semestris.");
         }
         if (this.problems.missingPrerequisites) {
-          messages.push("⚠️ Eeldusained läbimata.");
+          messages.push("Eeldusained läbimata.");
         }
         return messages;
       },
@@ -95,8 +93,7 @@
 
             this.$emit('update-type', updatedCourse.type); // Emit the type
 
-            console.log('Emitted update-type event with type:', updatedCourse.type);
-
+            
 
         } catch (error) {
             console.error('Error updating course type:', error);
@@ -107,6 +104,7 @@
   </script>
   
   <style scoped>
+
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -118,6 +116,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(15px);
   }
   
   .modal-content {
