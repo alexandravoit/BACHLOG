@@ -7,4 +7,5 @@ a small error in your initial program - whoops! might not graduate on time now.
 
 **BUT WORRY NOT! Bachlog will oversee your grand plans and make sure that they are in accordance with UT's laws :)**
 ***
-<img width="1067" alt="TEXTLOGO2" src="https://github.com/user-attachments/assets/b37baac7-7350-44c5-8bdc-b50db3e64af1" />
+<img width="1067" alt="TEXLOGOGitHub" src="https://github.com/user-attachments/assets/4b972094-37a8-43ce-9825-5c0c0226d460" />
+
