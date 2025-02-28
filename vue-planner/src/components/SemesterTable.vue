@@ -1,6 +1,12 @@
 <template>
   <div class="semester-table" :key="componentKey">
     <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
+
+      <div class="semesterHeader">
+        <p>SEM: {{ semester.id }}</p>
+        <p>EAP: {{ getEAP(semester.id) }}</p>
+      </div>
+      
       <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)">
         <div
           v-for="(course, courseIndex) in semester.courses"
@@ -54,7 +60,6 @@ export default {
 
 <style scoped>
 .semester-table {
-  background-color: rgb(24, 56, 100);
   margin-top: 1.5rem;
 
   display: grid;
@@ -63,16 +68,18 @@ export default {
 }
 
 .semesterHeader {
-  font-size: x-large;
-  font-weight: bold;
+  font-family: 'MAGO-SANS';
+  color: white !important;
+  -webkit-text-stroke: 1px black;
+  
+  font-size: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   text-decoration: none;
-  color: inherit;
-  cursor: pointer;
 }
 
 .semesterHeader:hover {
-    color: white;
-    -webkit-text-stroke: 1px #333;
 }
 
 .drop-zone {
@@ -82,8 +89,7 @@ export default {
   grid-template-rows: repeat(3, 1fr);
   gap: 10px;
 
-
-  border: 2px solid #ffffff;
+  background-color: rgb(238, 238, 238);
   border-radius: 8px;
   padding: 10px;
   justify-items: center;
@@ -97,7 +103,7 @@ export default {
 }
 
 .drop-zone:hover {
-  background-color: #f0f0f0;
+  background-color: #e1e1e1;
 }
 
 .course-box {
@@ -125,7 +131,7 @@ export default {
 .course-box p {
   color: white;
   margin: 0;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: bold;
   transition: opacity 0.3s ease;
 }
@@ -136,7 +142,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 12px;
+  font-size: 10px;
   text-align: center;
   width: 100%;
   padding: 0 10px;
