@@ -1,8 +1,6 @@
 <template>
   <div class="semester-table" :key="componentKey">
     <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
-      <router-link :to="`/semester/${semester.id}`" class="semesterHeader">SEMESTER {{ semester.id }}</router-link>
-      <p>EAP: {{ getEAP(semester.id) }}</p>
       <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)">
         <div
           v-for="(course, courseIndex) in semester.courses"
@@ -56,18 +54,12 @@ export default {
 
 <style scoped>
 .semester-table {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  background-color: rgb(24, 56, 100);
   margin-top: 1.5rem;
-}
 
-.semester {
-  border: solid 1px #ddd;
-  border-radius: 12px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .semesterHeader {
@@ -84,15 +76,24 @@ export default {
 }
 
 .drop-zone {
+  aspect-ratio: 1/1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   gap: 10px;
+
+
   border: 2px solid #ffffff;
   border-radius: 8px;
-  min-height: 100px;
   padding: 10px;
-  margin-top: 10px;
+  justify-items: center;
+  align-items: center; 
   transition: background-color 0.2s;
+}
+
+.drop-zone:has(> :nth-child(10)) {
+  aspect-ratio: auto; 
+  grid-template-rows: repeat(4, 1fr);
 }
 
 .drop-zone:hover {
@@ -100,6 +101,7 @@ export default {
 }
 
 .course-box {
+  width: 70%;
   padding: 10px;
   border-radius: 10px;
   cursor: move;
@@ -111,7 +113,6 @@ export default {
   overflow: hidden;
   word-wrap: break-word;
   aspect-ratio: 1 / 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   position: relative;
 }

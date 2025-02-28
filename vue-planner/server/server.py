@@ -19,7 +19,7 @@ def getLikelySemester(sügisCount, kevadCount):
 
 def scrape_course_semesters(course_code):
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False for debugging
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
         try:
