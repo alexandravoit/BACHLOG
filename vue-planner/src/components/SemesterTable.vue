@@ -7,7 +7,7 @@
         <p>EAP: {{ getEAP(semester.id) }}</p>
       </div>
       
-      <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)">
+      <div class="drop-zone" @dragover.prevent @drop="handleDrop($event, index)" @click="route(semester.id)" :data-semester="semester.id">
         <div
           v-for="(course, courseIndex) in semester.courses"
           :key="courseIndex"
@@ -17,6 +17,7 @@
           draggable="true"
           @dragstart="handleCourseDragStart($event, index, courseIndex)"
           @click="showCourseDetails(course)"
+          @click.stop="showCourseDetails(course)"
         >
           <span class="delete-btn" @click="deleteCourse($event, index, courseIndex)">×</span>
           <p class="bold">{{ course.code }}</p>
@@ -55,6 +56,13 @@ export default {
       typeToColor,
     };
   },
+
+  methods: {
+    route(semesterId) {
+      this.$router.push(`/semester/${semesterId}`);
+    },
+  },
+
 };
 </script>
 
@@ -88,6 +96,7 @@ export default {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 10px;
+  position: relative;
 
   background-color: rgb(238, 238, 238);
   border-radius: 8px;
@@ -95,6 +104,20 @@ export default {
   justify-items: center;
   align-items: center; 
   transition: background-color 0.2s;
+}
+
+.drop-zone::before {
+  font-family: 'MAGO-SANS';
+  content: attr(data-semester); 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  font-size: 80px;  
+  font-weight: bold;
+  color: rgb(255, 255, 255); 
+  z-index: 0;
+  pointer-events: none;
 }
 
 .drop-zone:has(> :nth-child(10)) {
