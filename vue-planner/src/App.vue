@@ -3,7 +3,7 @@
 
     <div class="header">
 
-      <p>BACHLOG</p>
+      <img src="/favicon.png" alt="">
       <router-link to="/">KODU</router-link>
       <router-link to="/stats">STATID</router-link>
       <router-link to="/search">PLANEERIJA</router-link>
@@ -45,28 +45,35 @@ export default {
   flex-direction: row;
   align-self: center;
   align-items: center;
-  border: 2px solid #333;
+  justify-content: space-between;
 
-  width: 100%;
-  margin: 20px;
   padding: 20px;
   gap: 20px;
-
-  color: #333;
-  font-size: xx-large;
-  font-weight: bold;
   text-decoration: none;
 }
 
 .header a {
+  color: white;
+  -webkit-text-stroke: 1px #333;
+  font-size: 2.5rem;
+  font-weight: bolder;
   text-decoration: none; 
-  color: inherit; 
 }
 
 .header a:hover {
   text-decoration: none; 
-  color: white;
-  -webkit-text-stroke: 1px #333;
+  color: #333;
+
+} 
+
+img {
+  width: 8%;
+}
+
+@media (max-width: 768px) {
+  .header a {
+  font-size: 2rem;
+}
 }
 
 </style>
