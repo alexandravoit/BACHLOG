@@ -233,7 +233,7 @@ export default {
         } else {
           const prereqs = additional_info.prerequisites;
           const mainPre = prereqs[0].code;
-          const altPres = prereqs[0].alternatives;
+          const altPres = prereqs[0].alternatives || [];
           const eeldused = [mainPre, ...altPres.map(alt => alt.code)];
 
           this.eeldused[course.code] = eeldused;
