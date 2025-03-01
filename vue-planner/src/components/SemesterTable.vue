@@ -29,7 +29,7 @@
 
 <script>
 const typeToColor = {
-  määramata: '#e0e1dd',
+  määramata: '#1F2E48',
   kohustuslik: '#0d1b2a',
   valikaine: '#1B263B',  
   vabaaine: '#415a77',   
@@ -73,7 +73,7 @@ export default {
 }
 
 .semesterHeader {
-  color: rgb(228, 228, 228);
+  color: rgb(240, 237, 237);
   font-size: 30px;
   font-weight: bold;
   display: flex;
@@ -90,7 +90,7 @@ export default {
   gap: 10px;
   position: relative;
 
-  background-color: rgb(228, 228, 228);
+  background-color: rgb(240, 237, 237);
   border-radius: 15px;
   padding: 10px;
   justify-items: center;

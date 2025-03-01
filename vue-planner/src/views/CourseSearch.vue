@@ -309,4 +309,9 @@ export default {
     padding: 20px;
   }
 
+  h1 {
+    color: rgb(240, 237, 237);
+    font-size: 30px;
+  }
+
 </style>

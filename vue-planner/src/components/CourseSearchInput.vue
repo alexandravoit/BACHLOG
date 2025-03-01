@@ -3,7 +3,7 @@
     <input
       v-model="query"
       type="text"
-      placeholder="KURSUSE KOOD"
+      placeholder="LTAT.04.001"
       @input="searchCourses"
     />
     <div v-if="courses.length > 0">
@@ -73,31 +73,29 @@ export default {
 
 <style scoped>
 input {
-  width: 33%;
+  width: 270px;
   align-self: center;
   border: none;
   height: 50px;
   background-color: #f5f5f5;
-  border-radius: 8px;
+  border-radius: 15px;
   text-align: center;
   font-size: large;
 }
 
+
 .kursused {
-  border: solid 1px #ddd;
-  border-radius: 12px;
+  border-radius: 15px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 20px;
   padding: 20px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .kursus {
-  background-color: #ffffff;
+  border: #333 1px solid;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   cursor: move;
   display: flex;
   flex-direction: column;
@@ -107,13 +105,11 @@ input {
   overflow: hidden;
   word-wrap: break-word;
   aspect-ratio: 1 / 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   position: relative;
 }
 
 .kursus:hover {
-  border: #333 solid 1px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   animation: floatAnimation 1.5s ease-in-out infinite;
 }
@@ -132,10 +128,9 @@ input {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 14px;
+  font-size: 11px;
   text-align: center;
-  width: 100%;
-  padding: 0 10px;
+  padding: 20px;
 }
 
 .kursus:hover .bold {
@@ -156,6 +151,7 @@ input {
 }
 
 .leitud {
+  font-size: 40px;
     color: white;
     -webkit-text-stroke: 1px #333;
 }
