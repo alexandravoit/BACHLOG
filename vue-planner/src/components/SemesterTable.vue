@@ -3,7 +3,6 @@
     <div class="semester" v-for="(semester, index) in semesters" :key="semester.id">
 
       <div class="semesterHeader">
-        <p>SEM: {{ semester.id }}</p>
         <p>EAP: {{ getEAP(semester.id) }}</p>
       </div>
       
@@ -68,26 +67,19 @@ export default {
 
 <style scoped>
 .semester-table {
-  margin-top: 1.5rem;
-
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
 .semesterHeader {
-  font-family: 'MAGO-SANS';
-  color: white !important;
-  -webkit-text-stroke: 1px black;
-  
+  color: rgb(228, 228, 228);
   font-size: 30px;
+  font-weight: bold;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: end;
   text-decoration: none;
-}
-
-.semesterHeader:hover {
 }
 
 .drop-zone {
@@ -98,8 +90,8 @@ export default {
   gap: 10px;
   position: relative;
 
-  background-color: rgb(238, 238, 238);
-  border-radius: 8px;
+  background-color: rgb(228, 228, 228);
+  border-radius: 15px;
   padding: 10px;
   justify-items: center;
   align-items: center; 
@@ -126,13 +118,13 @@ export default {
 }
 
 .drop-zone:hover {
-  background-color: #e1e1e1;
+  background-color: #d1d0d0;
 }
 
 .course-box {
   width: 70%;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 15px;
   cursor: move;
   display: flex;
   flex-direction: column;
@@ -154,9 +146,9 @@ export default {
 .course-box p {
   color: white;
   margin: 0;
-  font-size: 10px;
   font-weight: bold;
   transition: opacity 0.3s ease;
+  font-size: 12px;
 }
 
 .course-box .title {
@@ -165,10 +157,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 10px;
   text-align: center;
-  width: 100%;
-  padding: 0 10px;
 }
 
 .course-box:hover .bold {
@@ -216,4 +205,17 @@ export default {
 .invalid-course:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+@media (max-width: 1024px) {
+  .semester-table {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .semester-table {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 </style>
