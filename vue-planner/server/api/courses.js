@@ -172,16 +172,22 @@ router.get('/stats/eap-by-type', (req, res) => {
 });
 
 
-// Get average grade
 router.get('/stats/average', (req, res) => {
   const query = `
-    SELECT SUM(grade * credits) / SUM(credits) as average
-    FROM courses
+      SELECT 
+        COALESCE(SUM(grade * credits), 0) * 1.0 / NULLIF(SUM(credits), 0) as average
+      FROM courses
+      WHERE grade IS NOT NULL AND grade <> '';
   `;
 
   db.get(query, (err, row) => {
     if (err) {
       return res.status(500).json({ error: err.message });
+    }
+
+    // Handle case where SUM(credits) is 0
+    if (!row.average) {
+      return res.json({ average: 0 });
     }
 
     res.json({ average: row.average });

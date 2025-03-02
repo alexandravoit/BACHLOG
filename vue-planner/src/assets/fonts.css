@@ -2,3 +2,8 @@
     font-family: 'MAGO-SANS';
     src: url('./fonts/MAGO-SANS.otf') format('opentype');
   }
+
+@font-face {
+  font-family: 'RESQUARE';
+  src: url('./fonts/ReSquare-Bold.ttf') format('truetype');
+}

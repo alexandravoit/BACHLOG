@@ -3,7 +3,7 @@
 
     <div class="header">
 
-      <img src="/favicon.png" alt="">
+      <img src="@/assets/logo.png" alt="">
       <router-link to="/">KODU</router-link>
       <router-link to="/stats">STATID</router-link>
       <router-link to="/search">PLANEERIJA</router-link>
@@ -32,7 +32,7 @@ export default {
 <style scoped>
 
 .app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: RESQUARE;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -43,7 +43,6 @@ export default {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  align-self: center;
   align-items: center;
   justify-content: space-between;
 
@@ -53,8 +52,7 @@ export default {
 }
 
 .header a {
-  color: white;
-  -webkit-text-stroke: 1px #333;
+  color: #333;
   font-size: 2.5rem;
   font-weight: bolder;
   text-decoration: none; 
@@ -62,7 +60,7 @@ export default {
 
 .header a:hover {
   text-decoration: none; 
-  color: #333;
+  color: #ff7af4;
 
 } 
 

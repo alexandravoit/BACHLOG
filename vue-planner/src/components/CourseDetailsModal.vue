@@ -105,6 +105,10 @@
   
   <style scoped>
 
+  * {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
   .modal-overlay {
     position: fixed;
     top: 0;

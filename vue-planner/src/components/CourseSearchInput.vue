@@ -72,6 +72,11 @@ export default {
 </script>
 
 <style scoped>
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
 input {
   width: 270px;
   align-self: center;
@@ -151,8 +156,10 @@ input {
 }
 
 .leitud {
+  font-family: RESQUARE;
+  font-size: bolder;
   font-size: 40px;
-    color: white;
-    -webkit-text-stroke: 1px #333;
+  color: #333;
+
 }
 </style>

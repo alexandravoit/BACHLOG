@@ -144,9 +144,10 @@ export default {
 }
 
 .course-box p {
+  font-family: Arial, Helvetica, sans-serif;
   color: white;
   margin: 0;
-  font-weight: bold;
+  font-weight: bolder;
   transition: opacity 0.3s ease;
   font-size: 12px;
 }
